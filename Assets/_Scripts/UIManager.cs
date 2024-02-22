@@ -39,16 +39,16 @@ public class UIManager : MonoBehaviour
     {
         _gameOverPanel.SetActive(true);
         _gameOverDistanceText.text = distanceTravelled.ToString("F0");
-        int rank = await BlockchainManager.Instance.GetRank();
-        _rankText.text = $"Global Rank: {rank}";
+        // int rank = await BlockchainManager.Instance.GetRank();
+        // _rankText.text = $"Global Rank: {rank}";
     }
 
     public async void SubmitScore()
     {
         _rankText.text = $"Global Rank: ...";
-        await BlockchainManager.Instance.SubmitScore(CharacterManager.Instance.DistanceTravelled);
-        int rank = await BlockchainManager.Instance.GetRank();
-        _rankText.text = $"Global Rank: {rank}";
+        // await BlockchainManager.Instance.SubmitScore(CharacterManager.Instance.DistanceTravelled);
+        // int rank = await BlockchainManager.Instance.GetRank();
+        // _rankText.text = $"Global Rank: {rank}";
     }
 
     public void Restart()
