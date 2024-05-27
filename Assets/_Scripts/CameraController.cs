@@ -8,7 +8,7 @@ public class CameraController : MonoBehaviour
     private Transform _player;
 
     [SerializeField]
-    private Vector3 _offset = new Vector3(0, 2, -5);
+    private Vector3 _offset = new Vector3(0, 2, 5);//Vector3(0, 2, -5)
 
     private Vector3 _currentVelocity;
     private Quaternion _currentRotation;
