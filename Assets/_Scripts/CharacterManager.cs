@@ -70,7 +70,7 @@ public class CharacterManager : MonoBehaviour
     {
         if (IsInputEnabled)
         {
-            DistanceTravelled += _forwardSpeed * Time.deltaTime;
+            DistanceTravelled += _forwardSpeed/10 * Time.deltaTime;
 
             // Handle lane switching
             if (Input.GetKeyDown(KeyCode.A))

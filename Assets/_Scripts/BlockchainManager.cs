@@ -22,6 +22,13 @@ public class BlockchainManager : MonoBehaviour
     private string _distanceTravelled;
 
     public TextMeshProUGUI tokenBalanceAmountText;
+    public GameObject claimPanel;
+    public Button claimNFTPassButton;
+    public TextMeshProUGUI claimNFTPassButtonText;
+
+    public TextMeshProUGUI bronzeBalanceAmountText;
+    public TextMeshProUGUI silverBalanceAmountText;
+    public TextMeshProUGUI goldBalanceAmountText;
 
     private void Awake()
     {
@@ -65,12 +72,22 @@ public class BlockchainManager : MonoBehaviour
         );
 
         Address = await ThirdwebManager.Instance.SDK.wallet.Connect(connection);
-        InvokeOnLoggedIn();
+
+        var contract = ThirdwebManager.Instance.SDK.GetContract("0xDC9E649a41D2aC862b0Ac4bE764FE452079252a7");
+        var balance = await contract.ERC721.BalanceOf(Address);
+        if (balance == "0")
+        {
+            claimPanel.SetActive(true);
+        }
+        else {
+            InvokeOnLoggedIn();
+        }       
     }
 
     void InvokeOnLoggedIn() {
         OnLoggedIn?.Invoke(Address);
         GetTokenBalance();
+        GetRewardBalance();
     }
 
     internal async Task SubmitScore(float distanceTravelled)
@@ -108,6 +125,47 @@ public class BlockchainManager : MonoBehaviour
         var contract = ThirdwebManager.Instance.SDK.GetContract("0xAD1E8389FA2B6885937c3B4De702249DBA6a0C54");
         var balance = await contract.ERC20.BalanceOf(Address);
         tokenBalanceAmountText.text = balance.displayValue;
-
     }
+
+    public async void ClaimNFTPass() {
+        claimNFTPassButtonText.text = "Claiming...";
+        claimNFTPassButton.interactable = false;
+        var contract = ThirdwebManager.Instance.SDK.GetContract("0xDC9E649a41D2aC862b0Ac4bE764FE452079252a7");
+        var result = await contract.ERC721.ClaimTo(Address, 1);
+        claimNFTPassButtonText.text = "Claimed NFT Pass!";
+        claimPanel.SetActive(false);
+        InvokeOnLoggedIn();
+    }
+
+    public async void ClaimReward(string _distanceTravelled) {
+        var contract = ThirdwebManager.Instance.SDK.GetContract("0x3A10394497717d5B2E6e6334AFa74230e751F4e0");
+        if (int.Parse(_distanceTravelled) >= 1000) {
+            await contract.ERC1155.ClaimTo(Address, "2", 1);
+        } else if (int.Parse(_distanceTravelled) >= 500)
+        {
+            await contract.ERC1155.ClaimTo(Address, "1", 1);
+        }
+        else if (int.Parse(_distanceTravelled) >= 300)
+        {
+            await contract.ERC1155.ClaimTo(Address, "0", 1);
+        }
+        GetRewardBalance();
+    }
+
+    public void ClaimTokenAndReward() {
+        ClaimToken();
+        ClaimReward(_distanceTravelled);
+    }
+
+    public async void GetRewardBalance() {
+        var contract = ThirdwebManager.Instance.SDK.GetContract("0x3A10394497717d5B2E6e6334AFa74230e751F4e0");
+        var bronzeBalance = await contract.ERC1155.BalanceOf(Address, "0");
+        var silverBalance = await contract.ERC1155.BalanceOf(Address, "1");
+        var goldBalance = await contract.ERC1155.BalanceOf(Address, "2");
+
+        bronzeBalanceAmountText.text = bronzeBalance;
+        silverBalanceAmountText.text = silverBalance;
+        goldBalanceAmountText.text = goldBalance;
+    }
+
 }

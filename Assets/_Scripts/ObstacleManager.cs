@@ -27,25 +27,37 @@ public class ObstacleManager : MonoBehaviour
                 obj.AddComponent<SelfDestruct>();
             }
             var distanceTravelled = CharacterManager.Instance.DistanceTravelled;
-            if (distanceTravelled < 1000)
+            if (distanceTravelled < 50)//1000
             {
                 yield return new WaitForSeconds(1);
             }
-            else if (distanceTravelled < 2000)
+            else if (distanceTravelled < 100)//2000
             {
                 yield return new WaitForSeconds(0.8f);
             }
-            else if (distanceTravelled < 3000)
+            else if (distanceTravelled < 200)//3000
             {
                 yield return new WaitForSeconds(0.6f);
             }
-            else if (distanceTravelled < 4000)
+            else if (distanceTravelled < 300)//4000
             {
                 yield return new WaitForSeconds(0.4f);
             }
-            else
+            else if (distanceTravelled < 400)//4000
             {
                 yield return new WaitForSeconds(0.2f);
+            }
+            else if (distanceTravelled < 500)//4000
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+            else if (distanceTravelled < 600)//4000
+            {
+                yield return new WaitForSeconds(0.05f);
+            }
+            else
+            {
+                yield return new WaitForSeconds(0.01f);
             }
         }
     }
