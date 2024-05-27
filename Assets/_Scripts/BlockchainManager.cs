@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Thirdweb;
 using UnityEngine;
 using UnityEngine.Events;
+using TMPro;
+using UnityEngine.UI;
 
 public class BlockchainManager : MonoBehaviour
 {
@@ -13,6 +15,13 @@ public class BlockchainManager : MonoBehaviour
     public string Address { get; private set; }
 
     public static BlockchainManager Instance { get; private set; }
+
+    public Button claimTokenButton;
+    public TextMeshProUGUI claimTokenButtonText;
+    public CharacterManager characterManagerRef;
+    private string _distanceTravelled;
+
+    public TextMeshProUGUI tokenBalanceAmountText;
 
     private void Awake()
     {
@@ -25,6 +34,11 @@ public class BlockchainManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+    }
+
+    private void Update()
+    {
+        _distanceTravelled = characterManagerRef.DistanceTravelled.ToString("F0");
     }
 
     public async void Login(string authProvider)
@@ -51,8 +65,12 @@ public class BlockchainManager : MonoBehaviour
         );
 
         Address = await ThirdwebManager.Instance.SDK.wallet.Connect(connection);
+        InvokeOnLoggedIn();
+    }
 
+    void InvokeOnLoggedIn() {
         OnLoggedIn?.Invoke(Address);
+        GetTokenBalance();
     }
 
     internal async Task SubmitScore(float distanceTravelled)
@@ -74,5 +92,22 @@ public class BlockchainManager : MonoBehaviour
         var rank = await contract.Read<int>("getRank", Address);
         Debug.Log($"Rank for address {Address} is {rank}");
         return rank;
+    }
+
+    public async void ClaimToken() {
+        claimTokenButtonText.text = "Claiming...";
+        claimTokenButton.interactable = false;
+
+        var contract = ThirdwebManager.Instance.SDK.GetContract("0xAD1E8389FA2B6885937c3B4De702249DBA6a0C54");
+        var result = await contract.ERC20.ClaimTo(Address, _distanceTravelled);
+        claimTokenButtonText.text = "Claimed Token!";
+        GetTokenBalance();
+    }
+
+    public async void GetTokenBalance() {
+        var contract = ThirdwebManager.Instance.SDK.GetContract("0xAD1E8389FA2B6885937c3B4De702249DBA6a0C54");
+        var balance = await contract.ERC20.BalanceOf(Address);
+        tokenBalanceAmountText.text = balance.displayValue;
+
     }
 }
