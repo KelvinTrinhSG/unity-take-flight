@@ -37,6 +37,8 @@ public class BlockchainManager : MonoBehaviour
     public Button lotteryOpenButton;
     public TextMeshProUGUI lotteryOpenButtonText;
 
+    public TextMeshProUGUI text_Address_Detail;
+
     private void Awake()
     {
         if (Instance == null)
@@ -55,31 +57,11 @@ public class BlockchainManager : MonoBehaviour
         _distanceTravelled = characterManagerRef.DistanceTravelled.ToString("F0");
     }
 
-    public async void Login(string authProvider)
+    public async void Login()
     {
-        AuthProvider provider = AuthProvider.Google;
-        switch (authProvider)
-        {
-            case "google":
-                provider = AuthProvider.Google;
-                break;
-            case "apple":
-                provider = AuthProvider.Apple;
-                break;
-            case "facebook":
-                provider = AuthProvider.Facebook;
-                break;
-        }
-
-        var connection = new WalletConnection(
-            provider: WalletProvider.SmartWallet,
-            chainId: 421614,
-            personalWallet: WalletProvider.EmbeddedWallet,
-            authOptions: new AuthOptions(authProvider: provider)
-        );
-
-        Address = await ThirdwebManager.Instance.SDK.wallet.Connect(connection);
-
+        Address = await ThirdwebManager.Instance.SDK.wallet.GetAddress();
+        text_Address_Detail.text = Address;
+        Debug.Log(Address);
         var contract = ThirdwebManager.Instance.SDK.GetContract("0xDC9E649a41D2aC862b0Ac4bE764FE452079252a7");
         var balance = await contract.ERC721.BalanceOf(Address);
         if (balance == "0")
