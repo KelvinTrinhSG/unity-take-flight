@@ -14,7 +14,7 @@ public class CharacterManager : MonoBehaviour
     public float DistanceTravelled { get; private set; }
 
     [SerializeField]
-    private float _forwardSpeed = 10.0f;
+    public float _forwardSpeed = 10.0f;
 
     [SerializeField]
     private float _lateralSpeed = 5.0f;
