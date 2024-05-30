@@ -10,10 +10,16 @@ namespace Thirdweb.AccountAbstraction
     {
         // Bundler requests
 
-        public static async Task<EthGetUserOperationByHasResponse> EthGetUserOperationByHash(string bundlerUrl, string apiKey, object requestId, string userOpHash)
+        public static async Task<EthGetUserOperationByHashResponse> EthGetUserOperationByHash(string bundlerUrl, string apiKey, object requestId, string userOpHash)
         {
             var response = await BundlerRequest(bundlerUrl, apiKey, requestId, "eth_getUserOperationByHash", userOpHash);
-            return JsonConvert.DeserializeObject<EthGetUserOperationByHasResponse>(response.Result.ToString());
+            return JsonConvert.DeserializeObject<EthGetUserOperationByHashResponse>(response.Result.ToString());
+        }
+
+        public static async Task<EthGetUserOperationReceiptResponse> EthGetUserOperationReceipt(string bundlerUrl, string apiKey, object requestId, string userOpHash)
+        {
+            var response = await BundlerRequest(bundlerUrl, apiKey, requestId, "eth_getUserOperationReceipt", userOpHash);
+            return JsonConvert.DeserializeObject<EthGetUserOperationReceiptResponse>(response.Result.ToString());
         }
 
         public static async Task<string> EthSendUserOperation(string bundlerUrl, string apiKey, object requestId, UserOperationHexified userOp, string entryPoint)
@@ -26,6 +32,12 @@ namespace Thirdweb.AccountAbstraction
         {
             var response = await BundlerRequest(bundlerUrl, apiKey, requestId, "eth_estimateUserOperationGas", userOp, entryPoint);
             return JsonConvert.DeserializeObject<EthEstimateUserOperationGasResponse>(response.Result.ToString());
+        }
+
+        public static async Task<ThirdwebGetUserOperationGasPriceResponse> ThirdwebGetUserOperationGasPrice(string bundlerUrl, string apiKey, object requestId)
+        {
+            var response = await BundlerRequest(bundlerUrl, apiKey, requestId, "thirdweb_getUserOperationGasPrice");
+            return JsonConvert.DeserializeObject<ThirdwebGetUserOperationGasPriceResponse>(response.Result.ToString());
         }
 
         // Paymaster requests
@@ -59,9 +71,9 @@ namespace Thirdweb.AccountAbstraction
                 httpRequestMessage.Headers.Add("x-sdk-os", Utils.GetRuntimePlatform());
                 httpRequestMessage.Headers.Add("x-sdk-platform", "unity");
                 httpRequestMessage.Headers.Add("x-sdk-version", ThirdwebSDK.version);
-                httpRequestMessage.Headers.Add("x-client-id", ThirdwebManager.Instance.SDK.session.Options.clientId);
+                httpRequestMessage.Headers.Add("x-client-id", Utils.GetClientId());
                 if (!Utils.IsWebGLBuild())
-                    httpRequestMessage.Headers.Add("x-bundle-id", ThirdwebManager.Instance.SDK.session.Options.bundleId);
+                    httpRequestMessage.Headers.Add("x-bundle-id", Utils.GetBundleId());
             }
 
             var httpResponse = await client.SendAsync(httpRequestMessage);

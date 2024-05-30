@@ -17,9 +17,9 @@ namespace Thirdweb
         public struct Options
         {
             /// <summary>
-            /// Gasless configuration options for the Thirdweb SDK.
+            /// Gasless relayer configuration options for Thirdweb Engine..
             /// </summary>
-            public GaslessOptions? gasless;
+            public RelayerOptions? gasless;
 
             /// <summary>
             /// Storage configuration options for the Thirdweb SDK.
@@ -76,14 +76,39 @@ namespace Thirdweb
             public string[] appIcons;
 
             /// <summary>
-            /// The project ID for WalletConnect authentication.
+            /// WalletConnect Project ID (https://cloud.walletconnect.com/app).
             /// </summary>
             public string walletConnectProjectId;
 
             /// <summary>
-            /// Wallets to display in the WC modal (https://walletconnect.com/explorer)
+            /// WalletConnect WebGL QR Modal: enable recommended explorer wallet buttons.
+            /// </summary>
+            public bool walletConnectEnableExplorer;
+
+            /// <summary>
+            /// WalletConnect WebGL QR Modal: wallets to display in the WC modal (https://walletconnect.com/explorer).
             /// </summary>
             public string[] walletConnectExplorerRecommendedWalletIds;
+
+            /// <summary>
+            /// WalletConnect WebGL QR Modal: mapping of wallet id to wallet image.
+            /// </summary>
+            public Dictionary<string, string> walletConnectWalletImages;
+
+            /// <summary>
+            /// WalletConnect WebGL QR Modal: custom desktop wallets to display.
+            /// </summary>
+            public WalletConnectWalletOptions[] walletConnectDesktopWallets;
+
+            /// <summary>
+            /// WalletConnect WebGL QR Modal: custom mobile wallets to display.
+            /// </summary>
+            public WalletConnectWalletOptions[] walletConnectMobileWallets;
+
+            /// <summary>
+            /// WalletConnect WebGL QR Modal: set theme to 'light' or 'dark'.
+            /// </summary>
+            public string walletConnectThemeMode;
 
             /// <summary>
             /// When using OAuth2 (e.g. Google) to login on mobile, you can provide a redirect URL such as 'myapp://'.
@@ -94,6 +119,24 @@ namespace Thirdweb
             /// Additional data to pass to the wallet provider.
             /// </summary>
             public Dictionary<string, object> extras;
+        }
+
+        /// <summary>
+        /// Optional wallet configuration options for WalletConnect wallets, useful for displaying specific wallets only.
+        /// </summary>
+        [System.Serializable]
+        public struct WalletConnectWalletOptions
+        {
+            public string id;
+            public string name;
+            public WalletConnectWalletLinks links;
+        }
+
+        [System.Serializable]
+        public class WalletConnectWalletLinks
+        {
+            public string native;
+            public string universal;
         }
 
         /// <summary>
@@ -113,9 +156,14 @@ namespace Thirdweb
             public bool gasless;
 
             /// <summary>
-            /// Indicates whether to deploy the smart wallet upon signing any type of message.
+            /// The address of your ERC20 paymaster contract if used.
             /// </summary>
-            public bool deployOnSign;
+            public string erc20PaymasterAddress;
+
+            /// <summary>
+            /// The address of your ERC20 token if using ERC20 paymaster.
+            /// </summary>
+            public string erc20TokenAddress;
 
             /// <summary>
             /// The URL of the bundler service.
@@ -156,33 +204,16 @@ namespace Thirdweb
         }
 
         /// <summary>
-        /// Gasless configuration options.
+        /// Thirdweb Engine Relayer configuration options.
         /// </summary>
         [System.Serializable]
-        public struct GaslessOptions
+        public struct RelayerOptions
         {
-            /// <summary>
-            /// OpenZeppelin Defender Gasless configuration options.
-            /// </summary>
-            public OZDefenderOptions? openzeppelin;
-
-            /// <summary>
-            /// [Obsolete] Biconomy Gasless configuration options. Biconomy is not fully supported and will be removed soon. Use OpenZeppelin Defender instead.
-            /// </summary>
-            [System.Obsolete("Biconomy is not fully supported and will be removed soon. Use OpenZeppelin Defender instead.")]
-            public BiconomyOptions? biconomy;
-
-            /// <summary>
-            /// Indicates whether experimental chainless support is enabled.
-            /// </summary>
-            public bool experimentalChainlessSupport;
+            public EngineRelayerOptions engine;
         }
 
-        /// <summary>
-        /// OpenZeppelin Defender Gasless configuration options.
-        /// </summary>
         [System.Serializable]
-        public struct OZDefenderOptions
+        public struct EngineRelayerOptions
         {
             /// <summary>
             /// The URL of the relayer service.
@@ -205,40 +236,21 @@ namespace Thirdweb
             public string domainVersion;
         }
 
-        /// <summary>
-        /// Biconomy Gasless configuration options.
-        /// </summary>
-        [System.Serializable]
-        public struct BiconomyOptions
-        {
-            /// <summary>
-            /// The API ID for Biconomy.
-            /// </summary>
-            public string apiId;
-
-            /// <summary>
-            /// The API key for Biconomy.
-            /// </summary>
-            public string apiKey;
-        }
-
         private readonly string chainOrRPC;
 
         /// <summary>
         /// Connect and interact with a user's wallet.
         /// </summary>
-        public Wallet wallet;
+        public Wallet Wallet { get; internal set; }
 
         /// <summary>
-        /// Deploy new contracts.
+        /// Download files from anywhere, upload files to IPFS.
         /// </summary>
-        public Deployer deployer;
+        public Storage Storage { get; internal set; }
 
-        public Storage storage;
+        public ThirdwebSession Session { get; internal set; }
 
-        public ThirdwebSession session;
-
-        internal const string version = "4.6.3";
+        internal const string version = "4.13.3";
 
         /// <summary>
         /// Create an instance of the Thirdweb SDK.
@@ -246,29 +258,29 @@ namespace Thirdweb
         /// <param name="chainOrRPC">The chain name or RPC URL to connect to.</param>
         /// <param name="chainId">The chain ID.</param>
         /// <param name="options">Configuration options.</param>
-        public ThirdwebSDK(string chainOrRPC, BigInteger? chainId = null, Options options = new Options())
+        public ThirdwebSDK(string chainOrRPC, BigInteger chainId, Options options)
         {
             this.chainOrRPC = chainOrRPC;
-            this.wallet = new Wallet();
-            this.deployer = new Deployer();
-            this.storage = new Storage(options.storage, options.clientId);
+            this.Wallet = new Wallet();
+            this.Storage = new Storage(options.storage, options.clientId);
 
             string rpc = !chainOrRPC.StartsWith("https://")
                 ? (string.IsNullOrEmpty(options.clientId) ? $"https://{chainOrRPC}.rpc.thirdweb.com/" : $"https://{chainOrRPC}.rpc.thirdweb.com/{options.clientId}")
                 : chainOrRPC;
 
-            if (new System.Uri(rpc).Host.EndsWith(".thirdweb.com") && !rpc.Contains("bundleId="))
+            if (options.clientId != null && new System.Uri(rpc).Host.EndsWith(".thirdweb.com") && !rpc.Contains("bundleId="))
                 rpc = rpc.AppendBundleIdQueryParam();
 
             if (Utils.IsWebGLBuild())
             {
                 Bridge.Initialize(rpc, options);
+                this.Session = new ThirdwebSession(options, chainId, rpc);
             }
             else
             {
                 if (chainId == null)
                     throw new UnityException("Chain ID override required for native platforms!");
-                this.session = new ThirdwebSession(options, chainId.Value, rpc);
+                this.Session = new ThirdwebSession(options, chainId, rpc);
             }
 
             if (string.IsNullOrEmpty(options.clientId))

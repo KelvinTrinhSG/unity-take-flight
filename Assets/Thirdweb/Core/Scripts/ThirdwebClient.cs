@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Nethereum.JsonRpc.Client.RpcMessages;
 using Nethereum.JsonRpc.Client;
 using Newtonsoft.Json;
-using System.Diagnostics;
 
 namespace Thirdweb
 {
@@ -26,17 +25,12 @@ namespace Thirdweb
         private DateTime _httpClientLastCreatedAt;
         private readonly object _lockObject = new object();
 
-        public ThirdwebClient(
-            Uri baseUrl,
-            JsonSerializerSettings jsonSerializerSettings = null,
-            HttpClientHandler httpClientHandler = null
-        )
+        public ThirdwebClient(Uri baseUrl, JsonSerializerSettings jsonSerializerSettings = null, HttpClientHandler httpClientHandler = null)
         {
             _baseUrl = baseUrl;
 
             if (jsonSerializerSettings == null)
-                jsonSerializerSettings =
-                    DefaultJsonSerializerSettingsFactory.BuildDefaultJsonSerializerSettings();
+                jsonSerializerSettings = DefaultJsonSerializerSettingsFactory.BuildDefaultJsonSerializerSettings();
 
             _jsonSerializerSettings = jsonSerializerSettings;
             _httpClientHandler = httpClientHandler;
@@ -58,20 +52,12 @@ namespace Thirdweb
                 {
                     MaxConnectionsPerServer = MaximumConnectionsPerServer
                 };
-
+           
 #elif NETCOREAPP2_1 || NETCOREAPP3_1 || NET5_0_OR_GREATER
                 return new SocketsHttpHandler
                 {
-                    PooledConnectionLifetime = new TimeSpan(
-                        0,
-                        NUMBER_OF_SECONDS_TO_RECREATE_HTTP_CLIENT,
-                        0
-                    ),
-                    PooledConnectionIdleTimeout = new TimeSpan(
-                        0,
-                        NUMBER_OF_SECONDS_TO_RECREATE_HTTP_CLIENT,
-                        0
-                    ),
+                    PooledConnectionLifetime = new TimeSpan(0, NUMBER_OF_SECONDS_TO_RECREATE_HTTP_CLIENT, 0),
+                    PooledConnectionIdleTimeout = new TimeSpan(0, NUMBER_OF_SECONDS_TO_RECREATE_HTTP_CLIENT, 0),
                     MaxConnectionsPerServer = MaximumConnectionsPerServer
                 };
 #else
@@ -84,26 +70,17 @@ namespace Thirdweb
             }
         }
 
-        public ThirdwebClient(
-            Uri baseUrl,
-            HttpClient httpClient,
-            AuthenticationHeaderValue authHeaderValue = null,
-            JsonSerializerSettings jsonSerializerSettings = null
-        )
+        public ThirdwebClient(Uri baseUrl, HttpClient httpClient, AuthenticationHeaderValue authHeaderValue = null, JsonSerializerSettings jsonSerializerSettings = null)
         {
             _baseUrl = baseUrl;
 
             if (authHeaderValue == null)
             {
-                authHeaderValue =
-                    BasicAuthenticationHeaderHelper.GetBasicAuthenticationHeaderValueFromUri(
-                        baseUrl
-                    );
+                authHeaderValue = BasicAuthenticationHeaderHelper.GetBasicAuthenticationHeaderValueFromUri(baseUrl);
             }
 
             if (jsonSerializerSettings == null)
-                jsonSerializerSettings =
-                    DefaultJsonSerializerSettingsFactory.BuildDefaultJsonSerializerSettings();
+                jsonSerializerSettings = DefaultJsonSerializerSettingsFactory.BuildDefaultJsonSerializerSettings();
             _jsonSerializerSettings = jsonSerializerSettings;
             InitialiseHttpClient(httpClient);
             _httpClient = httpClient;
@@ -116,22 +93,14 @@ namespace Thirdweb
             {
                 var httpClient = GetOrCreateHttpClient();
                 var rpcRequestJson = JsonConvert.SerializeObject(requests, _jsonSerializerSettings);
-                var httpContent = new StringContent(
-                    rpcRequestJson,
-                    Encoding.UTF8,
-                    "application/json"
-                );
+                var httpContent = new StringContent(rpcRequestJson, Encoding.UTF8, "application/json");
                 var cancellationTokenSource = new CancellationTokenSource();
                 cancellationTokenSource.CancelAfter(ConnectionTimeout);
 
-                var httpResponseMessage = await httpClient
-                    .PostAsync(String.Empty, httpContent, cancellationTokenSource.Token)
-                    .ConfigureAwait(false);
+                var httpResponseMessage = await httpClient.PostAsync(String.Empty, httpContent, cancellationTokenSource.Token).ConfigureAwait(false);
                 httpResponseMessage.EnsureSuccessStatusCode();
 
-                var stream = await httpResponseMessage.Content
-                    .ReadAsStreamAsync()
-                    .ConfigureAwait(false);
+                var stream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 using (var streamReader = new StreamReader(stream))
                 using (var reader = new JsonTextReader(streamReader))
                 {
@@ -143,47 +112,30 @@ namespace Thirdweb
             }
             catch (TaskCanceledException ex)
             {
-                var exception = new RpcClientTimeoutException(
-                    $"Rpc timeout after {ConnectionTimeout.TotalMilliseconds} milliseconds",
-                    ex
-                );
+                var exception = new RpcClientTimeoutException($"Rpc timeout after {ConnectionTimeout.TotalMilliseconds} milliseconds", ex);
                 throw exception;
             }
             catch (Exception ex)
             {
-                var exception = new RpcClientUnknownException(
-                    "Error occurred when trying to send multiple rpc requests(s)",
-                    ex
-                );
+                var exception = new RpcClientUnknownException("Error occurred when trying to send multiple rpc requests(s)", ex);
                 throw exception;
             }
         }
 
-        protected override async Task<RpcResponseMessage> SendAsync(
-            RpcRequestMessage request,
-            string route = null
-        )
+        protected override async Task<RpcResponseMessage> SendAsync(RpcRequestMessage request, string route = null)
         {
             try
             {
                 var httpClient = GetOrCreateHttpClient();
                 var rpcRequestJson = JsonConvert.SerializeObject(request, _jsonSerializerSettings);
-                var httpContent = new StringContent(
-                    rpcRequestJson,
-                    Encoding.UTF8,
-                    "application/json"
-                );
+                var httpContent = new StringContent(rpcRequestJson, Encoding.UTF8, "application/json");
                 var cancellationTokenSource = new CancellationTokenSource();
                 cancellationTokenSource.CancelAfter(ConnectionTimeout);
 
-                var httpResponseMessage = await httpClient
-                    .PostAsync(route, httpContent, cancellationTokenSource.Token)
-                    .ConfigureAwait(false);
+                var httpResponseMessage = await httpClient.PostAsync(route, httpContent, cancellationTokenSource.Token).ConfigureAwait(false);
                 httpResponseMessage.EnsureSuccessStatusCode();
 
-                var stream = await httpResponseMessage.Content
-                    .ReadAsStreamAsync()
-                    .ConfigureAwait(false);
+                var stream = await httpResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 using (var streamReader = new StreamReader(stream))
                 using (var reader = new JsonTextReader(streamReader))
                 {
@@ -194,18 +146,12 @@ namespace Thirdweb
             }
             catch (TaskCanceledException ex)
             {
-                var exception = new RpcClientTimeoutException(
-                    $"Rpc timeout after {ConnectionTimeout.TotalMilliseconds} milliseconds",
-                    ex
-                );
+                var exception = new RpcClientTimeoutException($"Rpc timeout after {ConnectionTimeout.TotalMilliseconds} milliseconds", ex);
                 throw exception;
             }
             catch (Exception ex)
             {
-                var exception = new RpcClientUnknownException(
-                    "Error occurred when trying to send rpc requests(s): " + request.Method,
-                    ex
-                );
+                var exception = new RpcClientUnknownException("Error occurred when trying to send rpc requests(s): " + request.Method, ex);
                 throw exception;
             }
         }

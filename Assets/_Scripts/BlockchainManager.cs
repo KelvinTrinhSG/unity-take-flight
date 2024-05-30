@@ -8,6 +8,7 @@ using UnityEngine.Events;
 using TMPro;
 using UnityEngine.UI;
 using System.Numerics;
+using Thirdweb.Contracts.OffersLogic.ContractDefinition;
 
 public class BlockchainManager : MonoBehaviour
 {
@@ -59,19 +60,20 @@ public class BlockchainManager : MonoBehaviour
 
     public async void Login()
     {
-        Address = await ThirdwebManager.Instance.SDK.wallet.GetAddress();
+        Address = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
         text_Address_Detail.text = Address;
         Debug.Log(Address);
-        var contract = ThirdwebManager.Instance.SDK.GetContract("0xDC9E649a41D2aC862b0Ac4bE764FE452079252a7");
-        var balance = await contract.ERC721.BalanceOf(Address);
-        if (balance == "0")
+        Contract contract = ThirdwebManager.Instance.SDK.GetContract("0xDC9E649a41D2aC862b0Ac4bE764FE452079252a7");
+        List<NFT> nftList = await contract.ERC721.GetOwned(Address);
+        if (nftList.Count == 0)
         {
             claimPanel.SetActive(true);
         }
-        else {
+        else
+        {
             //Show Ship Lottery Panel
             ShowShipLotteryPanel();
-        }       
+        }     
     }
 
     public void ShowShipLotteryPanel() {
@@ -160,9 +162,9 @@ public class BlockchainManager : MonoBehaviour
         var silverBalance = await contract.ERC1155.BalanceOf(Address, "1");
         var goldBalance = await contract.ERC1155.BalanceOf(Address, "2");
 
-        bronzeBalanceAmountText.text = bronzeBalance;
-        silverBalanceAmountText.text = silverBalance;
-        goldBalanceAmountText.text = goldBalance;
+        bronzeBalanceAmountText.text = bronzeBalance.ToString();
+        silverBalanceAmountText.text = silverBalance.ToString();
+        goldBalanceAmountText.text = goldBalance.ToString();
     }
 
     private int countdownTime = 0;
@@ -240,6 +242,10 @@ public class BlockchainManager : MonoBehaviour
                 case 7:
                     Silver1SpaceShip();
                     break;
+                case 8:
+                case 9:
+                    DefaultSpaceShip();
+                    break;
                 default:
                     DefaultSpaceShip();
                     break;
@@ -280,6 +286,27 @@ public class BlockchainManager : MonoBehaviour
         }
     }
 
+    private void UpdateCamerad(int offset)
+    {
+        GameObject mainCamera = GameObject.Find("Main Camera");
+        if (mainCamera != null)
+        {
+            CameraController cameraController = mainCamera.GetComponent<CameraController>();
+            if (cameraController != null)
+            {
+                cameraController._offset = new UnityEngine.Vector3(0, 2, offset);
+            }
+            else
+            {
+                Debug.LogError("No characterManager");
+            }
+        }
+        else
+        {
+            Debug.LogError("No character");
+        }
+    }
+
     private void DefaultSpaceShip()
     {
         defaultSpaceShip.SetActive(true);
@@ -288,6 +315,7 @@ public class BlockchainManager : MonoBehaviour
         gold1SpaceShip.SetActive(false);
         gold2SpaceShip.SetActive(false);
         changeCharacterSpeed(50);
+        UpdateCamerad(0);
     }
 
     private void Silver1SpaceShip()
@@ -298,6 +326,7 @@ public class BlockchainManager : MonoBehaviour
         gold1SpaceShip.SetActive(false);
         gold2SpaceShip.SetActive(false);
         changeCharacterSpeed(80);
+        UpdateCamerad(2);
     }
 
     private void Silver2SpaceShip()
@@ -308,6 +337,7 @@ public class BlockchainManager : MonoBehaviour
         gold1SpaceShip.SetActive(false);
         gold2SpaceShip.SetActive(false);
         changeCharacterSpeed(120);
+        UpdateCamerad(5);
     }
 
     private void Gold1SpaceShip()
@@ -318,6 +348,7 @@ public class BlockchainManager : MonoBehaviour
         gold1SpaceShip.SetActive(true);
         gold2SpaceShip.SetActive(false);
         changeCharacterSpeed(150);
+        UpdateCamerad(9);
     }
 
     private void Gold2SpaceShip()
@@ -328,6 +359,7 @@ public class BlockchainManager : MonoBehaviour
         gold1SpaceShip.SetActive(false);
         gold2SpaceShip.SetActive(true);
         changeCharacterSpeed(200);
+        UpdateCamerad(14);
     }
 
     private void ResetSpaceShipLotteryPanel() {

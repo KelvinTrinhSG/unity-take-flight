@@ -18,16 +18,16 @@ namespace Thirdweb
         #region Properties
 
 
-        internal ThirdwebSDK.Options Options { get; private set; }
-        internal BigInteger ChainId { get; private set; }
-        internal string RPC { get; private set; }
-        internal SiweMessageService SiweSession { get; private set; }
-        internal Web3 Web3 { get; private set; }
-        internal ThirdwebChainData CurrentChainData { get; private set; }
+        public ThirdwebSDK.Options Options { get; private set; }
+        public BigInteger ChainId { get; private set; }
+        public string RPC { get; private set; }
+        public SiweMessageService SiweSession { get; private set; }
+        public Web3 Web3 { get; private set; }
+        public ThirdwebChainData CurrentChainData { get; private set; }
 
-        internal IThirdwebWallet ActiveWallet { get; private set; }
+        public IThirdwebWallet ActiveWallet { get; private set; }
 
-        internal static int Nonce = 0;
+        public static int Nonce { get; private set; } = 0;
 
         #endregion
 
@@ -94,10 +94,10 @@ namespace Thirdweb
                 case WalletProvider.Hyperplay:
                     ActiveWallet = new ThirdwebHyperplay(ChainId.ToString());
                     break;
-                case WalletProvider.EmbeddedWallet:
+                case WalletProvider.InAppWallet:
                     if (string.IsNullOrEmpty(Options.clientId))
-                        throw new UnityException("thirdweb client id is required for EmbeddedWallet connection method!");
-                    ActiveWallet = new ThirdwebEmbeddedWallet(Options.clientId, Options.bundleId);
+                        throw new UnityException("thirdweb client id is required for InAppWallet connection method!");
+                    ActiveWallet = new ThirdwebInAppWallet(Options.clientId, Options.bundleId);
                     break;
                 default:
                     throw new UnityException("This wallet connection method is not supported on this platform!");
@@ -134,7 +134,7 @@ namespace Thirdweb
             {
                 ThirdwebDebug.LogWarning("No active wallet detected, unable to disconnect.");
             }
-            ThirdwebManager.Instance.SDK.session = new ThirdwebSession(Options, ChainId, RPC);
+            ThirdwebManager.Instance.SDK.Session = new ThirdwebSession(Options, ChainId, RPC);
         }
 
         internal async Task<T> Request<T>(string method, params object[] parameters)
@@ -194,7 +194,6 @@ namespace Thirdweb
             CurrentChainData = newChainData;
             RPC = CurrentChainData.rpcUrls[0];
             Web3 = await ActiveWallet.GetWeb3();
-            Web3.TransactionManager.UseLegacyAsDefault = !Utils.Supports1559(newChainId.ToString());
             Web3.Client.OverridingRequestInterceptor = new ThirdwebInterceptor(ActiveWallet);
         }
 
@@ -225,6 +224,23 @@ namespace Thirdweb
             allChainsData.AddRange(additionalChainsData);
 
             ChainIDNetworkData currentNetwork = allChainsData.Find(x => x.chainId == chainId.ToString());
+            if (currentNetwork == null)
+            {
+                return new ThirdwebChainData()
+                {
+                    chainId = chainId.ToHex(false, true),
+                    blockExplorerUrls = new string[] { "https://etherscan.io" },
+                    chainName = $"Unknown Chain - {chainId}",
+                    iconUrls = new string[] { "ipfs://QmdwQDr6vmBtXmK2TmknkEuZNoaDqTasFdZdu3DRw8b2wt" },
+                    nativeCurrency = new ThirdwebNativeCurrency()
+                    {
+                        name = "Ether",
+                        symbol = "ETH",
+                        decimals = 18
+                    },
+                    rpcUrls = rpcOverride != null ? new string[] { rpcOverride } : new string[] { $"https://{chainId}.rpc.thirdweb.com" }
+                };
+            }
 
             var explorerUrls = new List<string>();
             if (currentNetwork.explorers != null)

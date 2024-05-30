@@ -61,8 +61,8 @@ namespace Thirdweb
         public NFTMetadata metadata;
         public string owner;
         public string type;
-        public int supply;
-        public int quantityOwned; // only for ERC1155.GetOwned()
+        public BigInteger supply;
+        public BigInteger? quantityOwned; // only for ERC1155.GetOwned()
 
         public override readonly string ToString()
         {
@@ -612,7 +612,7 @@ namespace Thirdweb
     [System.Serializable]
     public class GasStationResult
     {
-        public double maxPriorityFee;
-        public double maxFee;
+        public decimal maxPriorityFee;
+        public decimal maxFee;
     }
 }

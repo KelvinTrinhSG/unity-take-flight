@@ -31,10 +31,13 @@ namespace Thirdweb.Examples
         public class WalletProviderUIDictionary : SerializableDictionaryBase<WalletProvider, GameObject> { }
 
         [Header("Enabled Wallet Providers. Press Play to see changes.")]
-        public List<WalletProvider> enabledWalletProviders = new List<WalletProvider> { WalletProvider.LocalWallet, WalletProvider.EmbeddedWallet, WalletProvider.SmartWallet };
+        public List<WalletProvider> enabledWalletProviders = new List<WalletProvider> { WalletProvider.LocalWallet, WalletProvider.InAppWallet, WalletProvider.SmartWallet };
 
         [Header("Use ERC-4337 (Account Abstraction) compatible smart wallets.\nEnabling this will connect user to the associated smart wallet as per your ThirwebManager settings.")]
         public bool useSmartWallets = false;
+
+        [Header("End session on disconnect. If enabled, user will have to re-authenticate on next connect.")]
+        public bool endSessionOnDisconnect = false;
 
         [Header("Events")]
         public UnityEvent onStart;
@@ -96,10 +99,10 @@ namespace Thirdweb.Examples
                     provider: WalletProvider.SmartWallet,
                     chainId: BigInteger.Parse(_currentChainData.chainId),
                     authOptions: new AuthOptions(Enum.Parse<AuthProvider>(authProviderStr)),
-                    personalWallet: WalletProvider.EmbeddedWallet
+                    personalWallet: WalletProvider.InAppWallet
                 )
                 : new WalletConnection(
-                    provider: WalletProvider.EmbeddedWallet,
+                    provider: WalletProvider.InAppWallet,
                     chainId: BigInteger.Parse(_currentChainData.chainId),
                     authOptions: new AuthOptions(Enum.Parse<AuthProvider>(authProviderStr))
                 );
@@ -108,20 +111,45 @@ namespace Thirdweb.Examples
 
         public void ConnectEmail()
         {
-            var wc = useSmartWallets
-                ? new WalletConnection(
-                    provider: WalletProvider.SmartWallet,
-                    chainId: BigInteger.Parse(_currentChainData.chainId),
-                    email: emailInput.text,
-                    authOptions: new AuthOptions(AuthProvider.EmailOTP),
-                    personalWallet: WalletProvider.EmbeddedWallet
-                )
-                : new WalletConnection(
-                    provider: WalletProvider.EmbeddedWallet,
-                    chainId: BigInteger.Parse(_currentChainData.chainId),
-                    email: emailInput.text,
-                    authOptions: new AuthOptions(AuthProvider.EmailOTP)
-                );
+            string input = emailInput.text;
+            bool isEmail = Utils.IsValidEmail(input);
+
+            WalletConnection wc;
+            if (isEmail)
+            {
+                wc = useSmartWallets
+                    ? new WalletConnection(
+                        provider: WalletProvider.SmartWallet,
+                        chainId: BigInteger.Parse(_currentChainData.chainId),
+                        email: emailInput.text,
+                        authOptions: new AuthOptions(AuthProvider.EmailOTP),
+                        personalWallet: WalletProvider.InAppWallet
+                    )
+                    : new WalletConnection(
+                        provider: WalletProvider.InAppWallet,
+                        chainId: BigInteger.Parse(_currentChainData.chainId),
+                        email: emailInput.text,
+                        authOptions: new AuthOptions(AuthProvider.EmailOTP)
+                    );
+            }
+            else
+            {
+                wc = useSmartWallets
+                    ? new WalletConnection(
+                        provider: WalletProvider.SmartWallet,
+                        chainId: BigInteger.Parse(_currentChainData.chainId),
+                        phoneNumber: input,
+                        authOptions: new AuthOptions(AuthProvider.PhoneOTP),
+                        personalWallet: WalletProvider.InAppWallet
+                    )
+                    : new WalletConnection(
+                        provider: WalletProvider.InAppWallet,
+                        chainId: BigInteger.Parse(_currentChainData.chainId),
+                        phoneNumber: input,
+                        authOptions: new AuthOptions(AuthProvider.PhoneOTP)
+                    );
+            }
+
             Connect(wc);
         }
 
@@ -140,7 +168,7 @@ namespace Thirdweb.Examples
             {
                 _address = null;
                 _password = null;
-                await ThirdwebManager.Instance.SDK.wallet.Disconnect();
+                await ThirdwebManager.Instance.SDK.Wallet.Disconnect(endSession: endSessionOnDisconnect);
                 onDisconnected.Invoke();
             }
             catch (System.Exception e)
@@ -159,7 +187,7 @@ namespace Thirdweb.Examples
 
             try
             {
-                _address = await ThirdwebManager.Instance.SDK.wallet.Connect(wc);
+                _address = await ThirdwebManager.Instance.SDK.Wallet.Connect(wc);
                 exportButton.SetActive(wc.provider == WalletProvider.LocalWallet);
             }
             catch (Exception e)
@@ -181,7 +209,7 @@ namespace Thirdweb.Examples
             foreach (var addressText in addressTexts)
                 addressText.text = addy;
 
-            var bal = await ThirdwebManager.Instance.SDK.wallet.GetBalance();
+            var bal = await ThirdwebManager.Instance.SDK.Wallet.GetBalance();
             var balStr = $"{bal.value.ToEth()} {bal.symbol}";
             foreach (var balanceText in balanceTexts)
                 balanceText.text = balStr;
@@ -227,7 +255,7 @@ namespace Thirdweb.Examples
             ThirdwebDebug.Log($"Switching to network: {chainData.identifier}...");
             try
             {
-                await ThirdwebManager.Instance.SDK.wallet.SwitchNetwork(BigInteger.Parse(chainData.chainId));
+                await ThirdwebManager.Instance.SDK.Wallet.SwitchNetwork(BigInteger.Parse(chainData.chainId));
                 ThirdwebManager.Instance.activeChain = chainData.identifier;
                 _currentChainData = ThirdwebManager.Instance.supportedChains.Find(x => x.identifier == ThirdwebManager.Instance.activeChain);
                 ThirdwebDebug.Log($"Switched to network: {chainData.identifier}");
@@ -245,14 +273,14 @@ namespace Thirdweb.Examples
         public async void ExportWallet()
         {
             ThirdwebDebug.Log("Exporting wallet...");
-            string json = await ThirdwebManager.Instance.SDK.wallet.Export(_password);
-            GUIUtility.systemCopyBuffer = json;
+            string json = await ThirdwebManager.Instance.SDK.Wallet.Export(_password);
+            await Utils.CopyToClipboard(json);
             ThirdwebDebug.Log($"Copied wallet to clipboard: {json}");
         }
 
-        public void CopyAddress()
+        public async void CopyAddress()
         {
-            GUIUtility.systemCopyBuffer = _address;
+            await Utils.CopyToClipboard(_address);
             ThirdwebDebug.Log($"Copied address to clipboard: {_address}");
         }
 
