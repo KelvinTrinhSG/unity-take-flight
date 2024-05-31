@@ -7053,7 +7053,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: activeChain
-      value: Lisk Sepolia Testnet
+      value: opBNB Mainnet
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: appDescription
@@ -7061,7 +7061,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: factoryAddress
-      value: 0xBD75E17d7799155D9c81c3D52E1Ed6BbF14fbE9e
+      value: 0xE3FF9b2bc775bf6bb8a429cbaf6A6f4174f21688
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: bundleIdOverride
@@ -7077,7 +7077,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[0].chainId
-      value: 4202
+      value: 204
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[1].chainId
@@ -7113,7 +7113,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[0].identifier
-      value: Lisk Sepolia Testnet
+      value: opBNB Mainnet
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[1].identifier
@@ -7149,7 +7149,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[0].rpcOverride
-      value: https://rpc.sepolia-api.lisk.com
+      value: https://opbnb-mainnet-rpc.bnbchain.org
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706405, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: m_LocalPosition.x
