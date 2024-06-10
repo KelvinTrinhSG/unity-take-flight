@@ -1317,11 +1317,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7458216348175956803, guid: 897cda79fe3077c4fbc0fb5916d433ee, type: 3}
       propertyPath: useSmartWallets
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7458216348175956803, guid: 897cda79fe3077c4fbc0fb5916d433ee, type: 3}
       propertyPath: enabledWalletProviders.Array.size
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7458216348175956803, guid: 897cda79fe3077c4fbc0fb5916d433ee, type: 3}
+      propertyPath: enabledWalletProviders.Array.data[0]
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7458216348175956803, guid: 897cda79fe3077c4fbc0fb5916d433ee, type: 3}
       propertyPath: onConnected.m_PersistentCalls.m_Calls.Array.size
@@ -7053,7 +7057,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: activeChain
-      value: opBNB Mainnet
+      value: VNBnode
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: appDescription
@@ -7077,7 +7081,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[0].chainId
-      value: 204
+      value: 568568
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[1].chainId
@@ -7113,7 +7117,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[0].identifier
-      value: opBNB Mainnet
+      value: VNBnode
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[1].identifier
@@ -7149,7 +7153,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[0].rpcOverride
-      value: https://opbnb-mainnet-rpc.bnbchain.org
+      value: https://fraa-flashbox-4402-rpc.a.stagenet.tanssi.network
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706405, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: m_LocalPosition.x
