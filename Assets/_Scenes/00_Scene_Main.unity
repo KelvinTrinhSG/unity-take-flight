@@ -641,6 +641,8 @@ MonoBehaviour:
   lotteryOpenButton: {fileID: 1410292311}
   lotteryOpenButtonText: {fileID: 2063745634}
   text_Address_Detail: {fileID: 2092233511}
+  button_Submit: {fileID: 324680890}
+  button_TryAgain: {fileID: 861650144}
   defaultSpaceShip: {fileID: 264924794}
   silver1SpaceShip: {fileID: 152147356}
   silver2SpaceShip: {fileID: 388927137}
@@ -1317,7 +1319,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7458216348175956803, guid: 897cda79fe3077c4fbc0fb5916d433ee, type: 3}
       propertyPath: useSmartWallets
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7458216348175956803, guid: 897cda79fe3077c4fbc0fb5916d433ee, type: 3}
       propertyPath: enabledWalletProviders.Array.size
@@ -1325,7 +1327,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7458216348175956803, guid: 897cda79fe3077c4fbc0fb5916d433ee, type: 3}
       propertyPath: enabledWalletProviders.Array.data[0]
-      value: 0
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 7458216348175956803, guid: 897cda79fe3077c4fbc0fb5916d433ee, type: 3}
       propertyPath: onConnected.m_PersistentCalls.m_Calls.Array.size
@@ -1819,7 +1821,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 324680891}
   m_OnClick:
     m_PersistentCalls:
@@ -2969,6 +2971,9 @@ MonoBehaviour:
   _gameOverPanel: {fileID: 1975539916}
   _gameOverDistanceText: {fileID: 1218636177}
   _rankText: {fileID: 488993272}
+  claimTokenButton: {fileID: 1920565208}
+  button_Submit: {fileID: 324680890}
+  button_TryAgain: {fileID: 861650144}
 --- !u!1 &844558999
 GameObject:
   m_ObjectHideFlags: 0
@@ -3317,7 +3322,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 861650145}
   m_OnClick:
     m_PersistentCalls:
@@ -7057,7 +7062,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: activeChain
-      value: VNBnode
+      value: Fraxtal Mainnet L2
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: appDescription
@@ -7065,7 +7070,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: factoryAddress
-      value: 0xE3FF9b2bc775bf6bb8a429cbaf6A6f4174f21688
+      value: 0xf24CDD7513E2A7697Eb5f7e1Af7Acea52b015F46
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: bundleIdOverride
@@ -7081,7 +7086,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[0].chainId
-      value: 568568
+      value: 252
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[1].chainId
@@ -7117,7 +7122,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[0].identifier
-      value: VNBnode
+      value: Fraxtal Mainnet L2
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[1].identifier
@@ -7153,7 +7158,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706404, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: supportedChains.Array.data[0].rpcOverride
-      value: https://fraa-flashbox-4402-rpc.a.stagenet.tanssi.network
+      value: https://rpc.frax.com
       objectReference: {fileID: 0}
     - target: {fileID: 4404896360829706405, guid: 379ed01658d62a14484f953196ff19db, type: 3}
       propertyPath: m_LocalPosition.x

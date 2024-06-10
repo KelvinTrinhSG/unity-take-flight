@@ -40,6 +40,9 @@ public class BlockchainManager : MonoBehaviour
 
     public TextMeshProUGUI text_Address_Detail;
 
+    public Button button_Submit;
+    public Button button_TryAgain;
+
     private int randomNumberCreated = 9;
 
     private void Awake()
@@ -62,10 +65,13 @@ public class BlockchainManager : MonoBehaviour
 
     public async void Login()
     {
+        claimTokenButton.interactable = true;
+        button_Submit.interactable = false;
+        button_TryAgain.interactable = false;
         Address = await ThirdwebManager.Instance.SDK.Wallet.GetAddress();
         text_Address_Detail.text = Address;
         Debug.Log(Address);
-        Contract contract = ThirdwebManager.Instance.SDK.GetContract("0x600538C24429A4D9b6E606F7d9f68F090545faff");
+        Contract contract = ThirdwebManager.Instance.SDK.GetContract("0x3731603f3083D61845460A71Ff519b34575f72A0");
         List<NFT> nftList = await contract.ERC721.GetOwned(Address);
         if (nftList.Count == 0)
         {
@@ -75,7 +81,7 @@ public class BlockchainManager : MonoBehaviour
         {
             //Show Ship Lottery Panel
             ShowShipLotteryPanel();
-        }     
+        }
     }
 
     public void ShowShipLotteryPanel() {
@@ -92,18 +98,24 @@ public class BlockchainManager : MonoBehaviour
 
     internal async Task SubmitScore(float distanceTravelled)
     {
+        claimTokenButton.interactable = false;
+        button_Submit.interactable = false;
+        button_TryAgain.interactable = false;
         Debug.Log($"Submitting score of {distanceTravelled} to blockchain for address {Address}");
         var contract = ThirdwebManager.Instance.SDK.GetContract(
-            "0x80AAB3710fed34dF12F7b4A5C5CD0903a5b94AC1",
+            "0x32347934877E45939D7D2459F900fAeD36056491",
             "[{\"type\":\"event\",\"name\":\"ScoreAddedd\",\"inputs\":[{\"type\":\"address\",\"name\":\"player\",\"indexed\":true,\"internalType\":\"address\"},{\"type\":\"uint256\",\"name\":\"score\",\"indexed\":false,\"internalType\":\"uint256\"}],\"outputs\":[],\"anonymous\":false},{\"type\":\"function\",\"name\":\"_scores\",\"inputs\":[{\"type\":\"address\",\"name\":\"\",\"internalType\":\"address\"}],\"outputs\":[{\"type\":\"uint256\",\"name\":\"\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getRank\",\"inputs\":[{\"type\":\"address\",\"name\":\"player\",\"internalType\":\"address\"}],\"outputs\":[{\"type\":\"uint256\",\"name\":\"rank\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"submitScore\",\"inputs\":[{\"type\":\"uint256\",\"name\":\"score\",\"internalType\":\"uint256\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"}]"
         );
         await contract.Write("submitScore", (int)distanceTravelled);
+        claimTokenButton.interactable = false;
+        button_Submit.interactable = false;
+        button_TryAgain.interactable = true;
     }
 
     internal async Task<int> GetRank()
     {
         var contract = ThirdwebManager.Instance.SDK.GetContract(
-           "0x80AAB3710fed34dF12F7b4A5C5CD0903a5b94AC1",
+            "0x32347934877E45939D7D2459F900fAeD36056491",
             "[{\"type\":\"event\",\"name\":\"ScoreAddedd\",\"inputs\":[{\"type\":\"address\",\"name\":\"player\",\"indexed\":true,\"internalType\":\"address\"},{\"type\":\"uint256\",\"name\":\"score\",\"indexed\":false,\"internalType\":\"uint256\"}],\"outputs\":[],\"anonymous\":false},{\"type\":\"function\",\"name\":\"_scores\",\"inputs\":[{\"type\":\"address\",\"name\":\"\",\"internalType\":\"address\"}],\"outputs\":[{\"type\":\"uint256\",\"name\":\"\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"getRank\",\"inputs\":[{\"type\":\"address\",\"name\":\"player\",\"internalType\":\"address\"}],\"outputs\":[{\"type\":\"uint256\",\"name\":\"rank\",\"internalType\":\"uint256\"}],\"stateMutability\":\"view\"},{\"type\":\"function\",\"name\":\"submitScore\",\"inputs\":[{\"type\":\"uint256\",\"name\":\"score\",\"internalType\":\"uint256\"}],\"outputs\":[],\"stateMutability\":\"nonpayable\"}]"
         );
         var rank = await contract.Read<int>("getRank", Address);
@@ -114,15 +126,19 @@ public class BlockchainManager : MonoBehaviour
     public async void ClaimToken() {
         claimTokenButtonText.text = "Claiming...";
         claimTokenButton.interactable = false;
+        button_Submit.interactable = false;
+        button_TryAgain.interactable = false;
 
-        var contract = ThirdwebManager.Instance.SDK.GetContract("0x0ae6B468f7c1fa609D03248F20b34E7ddEcdad66");
+        var contract = ThirdwebManager.Instance.SDK.GetContract("0x123fD1D25e93DF77E62Cf954eF96Ad5704999e0D");
         var result = await contract.ERC20.ClaimTo(Address, _distanceTravelled);
         claimTokenButtonText.text = "Claimed Token!";
         GetTokenBalance();
+        button_Submit.interactable = true;
+        button_TryAgain.interactable = false;
     }
 
     public async void GetTokenBalance() {
-        var contract = ThirdwebManager.Instance.SDK.GetContract("0x0ae6B468f7c1fa609D03248F20b34E7ddEcdad66");
+        var contract = ThirdwebManager.Instance.SDK.GetContract("0x123fD1D25e93DF77E62Cf954eF96Ad5704999e0D");
         var balance = await contract.ERC20.BalanceOf(Address);
         tokenBalanceAmountText.text = balance.displayValue;
     }
@@ -130,7 +146,7 @@ public class BlockchainManager : MonoBehaviour
     public async void ClaimNFTPass() {
         claimNFTPassButtonText.text = "Claiming...";
         claimNFTPassButton.interactable = false;
-        var contract = ThirdwebManager.Instance.SDK.GetContract("0x600538C24429A4D9b6E606F7d9f68F090545faff");
+        var contract = ThirdwebManager.Instance.SDK.GetContract("0x3731603f3083D61845460A71Ff519b34575f72A0");
         var result = await contract.ERC721.ClaimTo(Address, 1);
         claimNFTPassButtonText.text = "Claimed NFT Pass!";
         claimPanel.SetActive(false);
@@ -139,7 +155,7 @@ public class BlockchainManager : MonoBehaviour
     }
 
     public async void ClaimReward(string _distanceTravelled) {
-        var contract = ThirdwebManager.Instance.SDK.GetContract("0x7892534dF1aAbe109Ba3DE3aEE9f2C984AEB6362");
+        var contract = ThirdwebManager.Instance.SDK.GetContract("0xe37a909BFDAE24Ed9AC30603fdc761d95Aaa3C8B");
         if (int.Parse(_distanceTravelled) >= 1000) {
             await contract.ERC1155.ClaimTo(Address, "2", 1);
         } else if (int.Parse(_distanceTravelled) >= 500)
@@ -159,7 +175,7 @@ public class BlockchainManager : MonoBehaviour
     }
 
     public async void GetRewardBalance() {
-        var contract = ThirdwebManager.Instance.SDK.GetContract("0x7892534dF1aAbe109Ba3DE3aEE9f2C984AEB6362");
+        var contract = ThirdwebManager.Instance.SDK.GetContract("0xe37a909BFDAE24Ed9AC30603fdc761d95Aaa3C8B");
         var bronzeBalance = await contract.ERC1155.BalanceOf(Address, "0");
         var silverBalance = await contract.ERC1155.BalanceOf(Address, "1");
         var goldBalance = await contract.ERC1155.BalanceOf(Address, "2");

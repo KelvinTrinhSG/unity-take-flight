@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -19,6 +20,11 @@ public class UIManager : MonoBehaviour
 
     [SerializeField]
     private TMP_Text _rankText;
+
+    public Button claimTokenButton;
+    public Button button_Submit;
+    public Button button_TryAgain;
+
 
     private void Awake()
     {
@@ -53,6 +59,9 @@ public class UIManager : MonoBehaviour
 
     public void Restart()
     {
+        claimTokenButton.interactable = true;
+        button_Submit.interactable = true;
+        button_TryAgain.interactable = true;
         SceneManager.LoadScene(0);
     }
 }
